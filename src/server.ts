@@ -1,6 +1,6 @@
 import dotenv from 'dotenv'
 dotenv.config()
-import { zalandoBot } from './Bot/bot'
+import { zalandoBot } from './Bot/Zalando/zalandoBot'
 import { Cluster } from 'puppeteer-cluster'
 ;(async () => {
   const cluster = await Cluster.launch({
@@ -8,7 +8,6 @@ import { Cluster } from 'puppeteer-cluster'
     maxConcurrency: 3
   })
 
-  // Make a screenshot
   cluster.queue(
     {
       email: process.env.EMAIL1,

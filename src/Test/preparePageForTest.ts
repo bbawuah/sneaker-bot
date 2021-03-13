@@ -2,12 +2,12 @@ import { Page } from 'puppeteer-extra/dist/puppeteer'
 import UserAgent from 'random-useragent'
 
 export async function preparePageForTests(page: Page): Promise<void> {
+  // Random userAgen is deprecated. It should be removed in the future
   const randomUserAgent = UserAgent.getRandom(function (ua) {
     return ua.browserName === 'Chrome' && ua.osName === 'Linux'
   })
     ?.replace('en-US', '')
     .replace('en-us', '')
-  // Pass the User-Agent Test.
 
   if (randomUserAgent) {
     if (/HeadlessChrome/.test(randomUserAgent)) {
@@ -22,22 +22,10 @@ export async function preparePageForTests(page: Page): Promise<void> {
 
   // Pass the Plugins Length Test.
   await page.evaluateOnNewDocument(() => {
-    // Overwrite the `plugins` property to use a custom getter.
     Object.defineProperty(navigator, 'plugins', {
-      // This just needs to have `length > 0` for the current test,
-      // but we could mock the plugins too if necessary.
       configurable: true,
       get: () => [1, 2, 3, 4, 5]
     })
-  })
-
-  // Pass the Chrome Test.
-  await page.evaluateOnNewDocument(() => {
-    // We can mock this in as much depth as we need for the test.
-    window.navigator.chrome = {
-      runtime: {}
-      // etc.
-    }
   })
 
   // Pass the Languages Test.
@@ -46,7 +34,6 @@ export async function preparePageForTests(page: Page): Promise<void> {
   })
 
   await page.evaluateOnNewDocument(() => {
-    // Overwrite the `plugins` property to use a custom getter.
     Object.defineProperty(navigator, 'language', {
       configurable: true,
       get: () => 'en'

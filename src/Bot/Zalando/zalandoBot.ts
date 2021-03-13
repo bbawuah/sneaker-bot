@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer-extra'
 import stealth from 'puppeteer-extra-plugin-stealth'
-import { preparePageForTests } from '../Test/preparePageForTest'
+import { preparePageForTests } from '../../Test/preparePageForTest'
 import useProxy from 'puppeteer-page-proxy'
-import { getProxy } from '../Proxy/getProxy'
-import { logger } from '../Loggers/Loggers'
+import { getProxy } from '../../Proxy/getProxy'
+import { logger } from '../../Loggers/Loggers'
 import { Page } from 'puppeteer-extra/dist/puppeteer'
 
 const pluginStealth = stealth()
@@ -12,6 +12,7 @@ pluginStealth.onBrowser = async () => {}
 puppeteer.use(pluginStealth)
 puppeteer.defaultArgs()
 
+// Props
 export interface Props {
   page: Page
   data: {
@@ -24,13 +25,13 @@ export interface Props {
 }
 
 export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
-  // Launch browser
-
+  // Proxies
   await page.setRequestInterception(true)
   page.on('request', async (request) => {
     await useProxy(request, getProxy())
   })
 
+  // Tests
   await preparePageForTests(page)
   await page.setViewport({ width: 1024, height: 800 })
 
@@ -38,7 +39,10 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
   await page.goto(data.url)
   page.waitForNavigation({ waitUntil: 'networkidle0' }) // Wait for page to finish loading
 
-  await page.screenshot({ path: `screen-one-${data.email}.png`, type: 'png' })
+  await page.screenshot({
+    path: `screenshots/screen-one-${data.email}.png`,
+    type: 'png'
+  })
 
   logger.log({
     level: 'info',
@@ -46,6 +50,7 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
   })
 
   try {
+    // Wait for order-now button to be available
     await page.waitForSelector(
       'button[aria-label="Bestel nu!"].DJxzzA.u9KIT8.NB8Ll4.vk5JMf.ZkIJC-.Vn-7c-.FCIprz.heWLCX.RzUmIb.LyRfpJ.Md_Vex.NN8L-8.GTG2H9.MfX1a0.WCjo-q.EKabf7.aX2-iv.r9BRio.E6Km4r.mo6ZnF',
       {
@@ -142,7 +147,10 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
       '.DJxzzA.u9KIT8.NB8Ll4.vk5JMf.ZkIJC-.Vn-7c-.FCIprz.heWLCX.RzUmIb.LyRfpJ.Md_Vex.NN8L-8.GTG2H9.MfX1a0.WCjo-q.EKabf7.aX2-iv.r9BRio.E6Km4r.mo6ZnF'
     )
 
-    await page.screenshot({ path: `order-page-${data.email}.png`, type: 'png' })
+    await page.screenshot({
+      path: `screenshots/order-page-${data.email}.png`,
+      type: 'png'
+    })
     // Go to cart
     await page.goto('https://www.zalando.nl/cart')
 
@@ -157,7 +165,10 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
       )
       .then((value) => {
         if (value) {
-          page.screenshot({ path: `empty-page-${data.email}.png`, type: 'png' })
+          page.screenshot({
+            path: `screenshots/empty-page-${data.email}.png`,
+            type: 'png'
+          })
 
           logger.log({
             level: 'error',
@@ -189,7 +200,10 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
       '.z-1-button.z-coast-base-primary-accessible.z-coast-base__totals-tile__button-checkout.z-1-button--primary.z-1-button--button'
     )
 
-    await page.screenshot({ path: `login-page-${data.email}.png`, type: 'png' })
+    await page.screenshot({
+      path: `screenshots/login-page-${data.email}.png`,
+      type: 'png'
+    })
 
     await page.waitFor(300)
 
@@ -227,7 +241,7 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
     await page.waitForSelector('#delivery-destination-tab-0')
     await page.click('#delivery-destination-tab-0')
     await page.screenshot({
-      path: `delivery-page-${data.email}.png`,
+      path: `screenshots/delivery-page-${data.email}.png`,
       type: 'png'
     })
 
@@ -245,7 +259,7 @@ export const zalandoBot = async ({ page, data }: Props): Promise<void> => {
 
     await page.waitFor(200)
     await page.screenshot({
-      path: `address-page-${data.email}.png`,
+      path: `screenshots/address-page-${data.email}.png`,
       type: 'png'
     })
 
